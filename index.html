@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theo Dõi Tín Hiệu Giao Dịch</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input, textarea {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-add {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-add:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-delete {
+            background: #ff6b6b;
+            color: white;
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .btn-delete:hover {
+            background: #ee5a52;
+        }
+
+        .btn-clear {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background: #7f8c8d;
+        }
+
+        .signals-section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .signals-table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow-x: auto;
+        }
+
+        .signals-table thead {
+            background: #f8f9fa;
+        }
+
+        .signals-table th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+            font-size: 13px;
+        }
+
+        .signals-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        .signals-table tbody tr {
+            transition: background 0.2s;
+        }
+
+        .signals-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .code {
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .price-positive {
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        .price-negative {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        .price-neutral {
+            color: #95a5a6;
+        }
+
+        .status-up {
+            background: #d4edda;
+            color: #155724;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-down {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-break {
+            background: #cfe2ff;
+            color: #084298;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .notes-cell {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #666;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .signals-table {
+                font-size: 12px;
+            }
+
+            .signals-table th,
+            .signals-table td {
+                padding: 8px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .close-modal {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-modal:hover {
+            color: #333;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📊 Theo Dõi Tín Hiệu Giao Dịch</h1>
+            <p>Quản lý các tín hiệu khuyến nghị và theo dõi hiệu suất giao dịch</p>
+        </div>
+
+        <!-- Form Input -->
+        <div class="form-section">
+            <h2 class="section-title">Thêm Tín Hiệu Mới</h2>
+            <form id="signalForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="code">Mã CK <span style="color: red;">*</span></label>
+                        <input type="text" id="code" placeholder="VD: FTS" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="recommendPrice">Giá Khuyến Nghị <span style="color: red;">*</span></label>
+                        <input type="number" id="recommendPrice" placeholder="VD: 25000" step="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="stopLoss">Giá Cắt Lỗ <span style="color: red;">*</span></label>
+                        <input type="number" id="stopLoss" placeholder="VD: 22000" step="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="takeProfit">Giá Chốt Lời <span style="color: red;">*</span></label>
+                        <input type="number" id="takeProfit" placeholder="VD: 28000" step="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="currentPrice">Giá Hiện Tại <span style="color: red;">*</span></label>
+                        <input type="number" id="currentPrice" placeholder="VD: 25500" step="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="date">Ngày Khuyến Nghị</label>
+                        <input type="date" id="date">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="notes">Ghi Chú</label>
+                    <textarea id="notes" placeholder="Nhập ghi chú hoặc lý do khuyến nghị..."></textarea>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn-clear" onclick="clearForm()">Xóa Form</button>
+                    <button type="submit" class="btn-add">Thêm Tín Hiệu</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Stats -->
+        <div class="signals-section" style="margin-bottom: 30px;">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Tổng Tín Hiệu</div>
+                    <div class="stat-value" id="totalSignals">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Có Lãi</div>
+                    <div class="stat-value price-positive" id="profitCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Có Lỗ</div>
+                    <div class="stat-value price-negative" id="lossCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Trung Bình Lời/Lỗ</div>
+                    <div class="stat-value" id="avgPnl">0 ₫</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signals Table -->
+        <div class="signals-section">
+            <h2 class="section-title">Danh Sách Tín Hiệu</h2>
+            
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Tìm kiếm mã CK...">
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table class="signals-table" id="signalsTable">
+                    <thead>
+                        <tr>
+                            <th>Mã CK</th>
+                            <th>Ngày</th>
+                            <th>Giá KN</th>
+                            <th>Giá Hiện Tại</th>
+                            <th>Cắt Lỗ</th>
+                            <th>Chốt Lời</th>
+                            <th>Lời/Lỗ</th>
+                            <th>Lời/Lỗ %</th>
+                            <th>Ghi Chú</th>
+                            <th>Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="signalsTableBody">
+                    </tbody>
+                </table>
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-state-icon">📭</div>
+                    <div>Chưa có tín hiệu nào. Hãy thêm tín hiệu mới!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeEditModal()">&times;</span>
+            <div class="modal-title">Cập Nhật Tín Hiệu</div>
+            <form id="editForm">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="editCode">Mã CK</label>
+                    <input type="text" id="editCode" readonly style="background: #f5f5f5;">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="editCurrentPrice">Giá Hiện Tại</label>
+                    <input type="number" id="editCurrentPrice" step="100" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="editNotes">Ghi Chú</label>
+                    <textarea id="editNotes"></textarea>
+                </div>
+                <div class="button-group" style="margin-top: 20px;">
+                    <button type="button" class="btn-clear" onclick="closeEditModal()">Hủy</button>
+                    <button type="submit" class="btn-add">Cập Nhật</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Load data from localStorage
+        let signals = JSON.parse(localStorage.getItem('signals')) || [];
+        let editingIndex = -1;
+
+        // Set today's date as default
+        document.getElementById('date').valueAsDate = new Date();
+
+        // Form submission
+        document.getElementById('signalForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            addSignal();
+        });
+
+        // Edit form submission
+        document.getElementById('editForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            updateSignal();
+        });
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toUpperCase();
+            renderTable(signals.filter(s => s.code.includes(searchTerm)));
+        });
+
+        function addSignal() {
+            const code = document.getElementById('code').value.toUpperCase();
+            const recommendPrice = parseFloat(document.getElementById('recommendPrice').value);
+            const stopLoss = parseFloat(document.getElementById('stopLoss').value);
+            const takeProfit = parseFloat(document.getElementById('takeProfit').value);
+            const currentPrice = parseFloat(document.getElementById('currentPrice').value);
+            const date = document.getElementById('date').value;
+            const notes = document.getElementById('notes').value;
+
+            if (!code || !recommendPrice || !stopLoss || !takeProfit || !currentPrice) {
+                alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
+                return;
+            }
+
+            const signal = {
+                id: Date.now(),
+                code,
+                recommendPrice,
+                stopLoss,
+                takeProfit,
+                currentPrice,
+                date: date || new Date().toISOString().split('T')[0],
+                notes,
+                createdAt: new Date().toISOString()
+            };
+
+            signals.unshift(signal);
+            saveData();
+            clearForm();
+            renderTable(signals);
+            updateStats();
+        }
+
+        function deleteSignal(id) {
+            if (confirm('Bạn chắc chắn muốn xóa tín hiệu này?')) {
+                signals = signals.filter(s => s.id !== id);
+                saveData();
+                renderTable(signals);
+                updateStats();
+            }
+        }
+
+        function openEditModal(id) {
+            editingIndex = signals.findIndex(s => s.id === id);
+            const signal = signals[editingIndex];
+            document.getElementById('editCode').value = signal.code;
+            document.getElementById('editCurrentPrice').value = signal.currentPrice;
+            document.getElementById('editNotes').value = signal.notes;
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+            editingIndex = -1;
+        }
+
+        function updateSignal() {
+            if (editingIndex === -1) return;
+            signals[editingIndex].currentPrice = parseFloat(document.getElementById('editCurrentPrice').value);
+            signals[editingIndex].notes = document.getElementById('editNotes').value;
+            saveData();
+            renderTable(signals);
+            updateStats();
+            closeEditModal();
+        }
+
+        function clearForm() {
+            document.getElementById('signalForm').reset();
+            document.getElementById('date').valueAsDate = new Date();
+        }
+
+        function saveData() {
+            localStorage.setItem('signals', JSON.stringify(signals));
+        }
+
+        function calculatePnL(signal) {
+            return signal.currentPrice - signal.recommendPrice;
+        }
+
+        function calculatePnLPercent(signal) {
+            return ((signal.currentPrice - signal.recommendPrice) / signal.recommendPrice) * 100;
+        }
+
+        function getStatusClass(pnl) {
+            if (pnl > 0) return 'status-up';
+            if (pnl < 0) return 'status-down';
+            return 'status-break';
+        }
+
+        function getStatusText(pnl) {
+            if (pnl > 0) return '✓ Có Lãi';
+            if (pnl < 0) return '✗ Có Lỗ';
+            return '• Không Đổi';
+        }
+
+        function formatCurrency(num) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(num);
+        }
+
+        function renderTable(dataToRender = signals) {
+            const tbody = document.getElementById('signalsTableBody');
+            const emptyState = document.getElementById('emptyState');
+
+            if (dataToRender.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            tbody.innerHTML = dataToRender.map(signal => {
+                const pnl = calculatePnL(signal);
+                const pnlPercent = calculatePnLPercent(signal);
+                const statusClass = getStatusClass(pnl);
+                const statusText = getStatusText(pnl);
+
+                return `
+                    <tr>
+                        <td class="code">${signal.code}</td>
+                        <td>${new Date(signal.date).toLocaleDateString('vi-VN')}</td>
+                        <td>${formatCurrency(signal.recommendPrice)}</td>
+                        <td>
+                            <input type="number" value="${signal.currentPrice}" 
+                                onchange="updatePrice(${signal.id}, this.value)" 
+                                step="100" style="width: 100px; padding: 5px;">
+                        </td>
+                        <td>${formatCurrency(signal.stopLoss)}</td>
+                        <td>${formatCurrency(signal.takeProfit)}</td>
+                        <td class="${pnl >= 0 ? 'price-positive' : 'price-negative'}">
+                            ${formatCurrency(pnl)}
+                        </td>
+                        <td>
+                            <span class="${statusClass}">
+                                ${statusText} (${pnlPercent.toFixed(2)}%)
+                            </span>
+                        </td>
+                        <td class="notes-cell" title="${signal.notes}">${signal.notes || '-'}</td>
+                        <td style="white-space: nowrap;">
+                            <button class="btn-delete" onclick="openEditModal(${signal.id})">Sửa</button>
+                            <button class="btn-delete" onclick="deleteSignal(${signal.id})" style="margin-left: 5px;">Xóa</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updatePrice(id, newPrice) {
+            const signal = signals.find(s => s.id === id);
+            if (signal) {
+                signal.currentPrice = parseFloat(newPrice);
+                saveData();
+                renderTable(signals);
+                updateStats();
+            }
+        }
+
+        function updateStats() {
+            const total = signals.length;
+            const profitable = signals.filter(s => calculatePnL(s) > 0).length;
+            const losing = signals.filter(s => calculatePnL(s) < 0).length;
+            const avgPnl = total > 0 ? signals.reduce((sum, s) => sum + calculatePnL(s), 0) / total : 0;
+
+            document.getElementById('totalSignals').textContent = total;
+            document.getElementById('profitCount').textContent = profitable;
+            document.getElementById('lossCount').textContent = losing;
+            document.getElementById('avgPnl').textContent = formatCurrency(avgPnl);
+        }
+
+        // Initial render
+        renderTable();
+        updateStats();
+
+        // Auto-save and refresh every 10 seconds
+        setInterval(() => {
+            renderTable(signals);
+        }, 10000);
+    </script>
+</body>
+</html>
